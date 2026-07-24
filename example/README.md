@@ -1,1 +1,1 @@
-Samples for state_controller library.
+Samples for state_controllers library.

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:state_controller_sample/counter_widget.dart';
+import 'counter_widget.dart';
 
 class CounterController {
   final ValueNotifier<int> counter;

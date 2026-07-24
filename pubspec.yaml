@@ -1,8 +1,8 @@
-name: state_controller
+name: state_controllers
 description: A small library for keeping widget state and application logic in separate controller classes.
 version: 1.0.0
-repository: https://github.com/dumabg/state_controller
-homepage: https://github.com/dumabg/state_controller
+repository: https://github.com/dumabg/state_controllers
+homepage: https://github.com/dumabg/state_controllers
 
 environment:
   sdk: ^3.12.2
