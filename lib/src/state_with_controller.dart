@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:state_controllers/src/disposable.dart';
+import 'package:stateful_controllers/src/disposable.dart';
 
 import 'auto_dispose_value_listenable_builder_mixin.dart';
 

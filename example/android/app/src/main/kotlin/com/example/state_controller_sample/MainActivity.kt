@@ -1,4 +1,4 @@
-package com.example.state_controllers_sample
+package com.example.stateful_controllers_sample
 
 import io.flutter.embedding.android.FlutterActivity
 

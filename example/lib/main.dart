@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:state_controllers_sample/counter_widget.dart';
-import 'package:state_controllers_sample/users_widget.dart';
+import 'package:stateful_controllers_sample/counter_widget.dart';
+import 'package:stateful_controllers_sample/users_widget.dart';
 
 void main() {
   runApp(const MyApp());

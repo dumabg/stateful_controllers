@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:state_controllers/src/async_factory_isolated_creator_web.dart'
-    if (dart.library.io) 'package:state_controllers/src/async_factory_isolated_creator.dart';
+import 'package:stateful_controllers/src/async_factory_isolated_creator_web.dart'
+    if (dart.library.io) 'package:stateful_controllers/src/async_factory_isolated_creator.dart';
 
 import 'async_factory.dart';
 import 'async_state.dart' show AsyncState;

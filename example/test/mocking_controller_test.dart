@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:state_controllers_sample/main.dart';
-import 'package:state_controllers/src/async_state_with_controller.dart';
-import 'package:state_controllers_sample/users_controller.dart';
+import 'package:stateful_controllers_sample/main.dart';
+import 'package:stateful_controllers/src/async_state_with_controller.dart';
+import 'package:stateful_controllers_sample/users_controller.dart';
 
 class MockUsersController implements UsersController {
   @override

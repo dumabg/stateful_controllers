@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:state_controllers/state_controllers.dart';
+import 'package:stateful_controllers/stateful_controllers.dart';
 import 'users_controller.dart';
 
 class UsersWidget extends StatefulWidget {

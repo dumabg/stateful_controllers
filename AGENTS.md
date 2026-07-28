@@ -1,6 +1,6 @@
-# Using `state_controllers`
+# Using `stateful_controllers`
 
-`state_controllers` separates Flutter UI from mutable application logic:
+`stateful_controllers` separates Flutter UI from mutable application logic:
 
 - Keep widgets and their `State` classes focused on rendering and immutable
   widget configuration.
@@ -18,10 +18,10 @@
 - Import the library through its public entrypoint:
 
 ```dart
-import 'package:state_controllers/state_controllers.dart';
+import 'package:stateful_controllers/stateful_controllers.dart';
 ```
 
-Do not import files from `package:state_controllers/src/...`; they are internal
+Do not import files from `package:stateful_controllers/src/...`; they are internal
 implementation details.
 
 ## Choose the right state base class

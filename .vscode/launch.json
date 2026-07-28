@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "state_controllers",
+            "name": "stateful_controllers",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "state_controllers (profile mode)",
+            "name": "stateful_controllers (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "state_controllers (release mode)",
+            "name": "stateful_controllers (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

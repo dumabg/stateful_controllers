@@ -1,4 +1,4 @@
-# state_controllers
+# stateful_controllers
 
 A small Flutter library for keeping widget state and application logic in
 separate controller classes. It provides base `State` classes that create a
@@ -28,13 +28,13 @@ The intended split is simple:
 Add the package to your Flutter project:
 
 ```sh
-flutter pub add state_controllers
+flutter pub add stateful_controllers
 ```
 
 Then import its public API:
 
 ```dart
-import 'package:state_controllers/state_controllers.dart';
+import 'package:stateful_controllers/stateful_controllers.dart';
 ```
 
 ## Synchronous controllers
