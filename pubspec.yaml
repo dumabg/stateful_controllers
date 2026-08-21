@@ -1,6 +1,6 @@
 name: stateful_controllers
 description: A small library for keeping widget state and application logic in separate controller classes.
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/dumabg/stateful_controllers
 homepage: https://github.com/dumabg/stateful_controllers
 
