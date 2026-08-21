@@ -1,45 +1,118 @@
-# Using `stateful_controllers`
+# `stateful_controllers`
 
 `stateful_controllers` separates Flutter UI from mutable application logic:
 
-- Keep widgets and their `State` classes focused on rendering and immutable
-  widget configuration.
+- Keep widgets and their `State` classes focused on rendering and immutable widget configuration.
 - Put actions, mutable state, and resource ownership in a controller.
 - Every `StatefulWidget` with state must have a controller.
-- Do not use `setState` in application widget states. Use `ValueNotifier`
-  fields on the controller and rebuild the affected UI with
-  `watch`.
-- Do not create `Dialog`s, `SnackBar`s, or other UI in a controller. The state
-  owns the UI; the controller may request an action through a widget-exposed
-  callback or another UI boundary.
-- A controller must not import presentation-only Flutter APIs such as
-  `material.dart` unless it genuinely owns a non-UI lifecycle resource. Prefer
-  `foundation.dart` for `ValueNotifier`.
+- Do not use `setState` in application widget states. Use `ValueNotifier` fields on the controller and rebuild the affected UI with `watch`.
+- Do not create `Dialog`s, `SnackBar`s, or other UI in a controller. The state owns the UI; the controller may request an action through a widget-exposed method.
+- A controller must not import presentation-only Flutter APIs such as `material.dart` unless it needs. Prefer `foundation.dart` for `ValueNotifier`.
 - Import the library through its public entrypoint:
 
 ```dart
 import 'package:stateful_controllers/stateful_controllers.dart';
 ```
 
-Do not import files from `package:stateful_controllers/src/...`; they are internal
-implementation details.
+Do not import files from `package:stateful_controllers/src/...`; they are internal implementation details.
 
-## Choose the right state base class
+- The controller must be ALWAYS in another file.
 
-| Situation                                                          | Base class                                           | What to implement                               |
-| ------------------------------------------------------------------ | ---------------------------------------------------- | ----------------------------------------------- |
-| The controller can be created immediately                          | `StateWithController<Widget, Controller>`            | `createController()`                            |
-| The state needs async setup but no controller                      | `AsyncState<Widget>`                                 | `asyncInitState()` and `buildWhenDone()`        |
-| The controller is created asynchronously using the widget as input | `AsyncStateWithController<Widget, Controller>`       | `controllerFactory` and `buildWhenDone()`       |
-| An async controller needs an input other than the widget           | `AsyncStateWithControllerParams<Widget, Controller>` | `controllerParamsFactory` and `buildWhenDone()` |
+## How to use it
+- Determine if the widget needs async data to be ready. For example, the widget shows a list of products that needs to load from server. The widget is only ready when the products are loaded.
 
-Use `controller`:
+- If needs async data, do the 'async controller steps' else do the 'controller steps'.
 
-- It is available after `createController()` in `StateWithController`.
-- In async state classes, it is available in `buildWhenDone()`; it may not be
-  available in loading, error, or disposal paths.
+### Async controller steps
+- Create a file that contains the controller and the controller factory.
+    - Create the file in the same directory than the widget file.
+    - Naming rules:
+      - Get the name of the widget without Widget. Example: UsersWidget resolves to Users. UsersView resolves to usersView.
+      - Controller name = resolved name + "Controller". Example: UsersController, UsersViewController.
+      - Controller factory name = resolved name + "Factory". Example: UsersFactory, UsersViewFactory.
+      - File name = controller name. Example: users_controller.dart, users_views_controller.dart.
+    
+- Create the controller factory:
+  - implements AsyncFactory<Controller, Widget>
+  - override Future<Controller> create(Widget widget) async.
+    - Load the data needed for the controller to be ready.
+    - return the controller.
+    
+- Create the controller:
+  - The constructor receives the data needed to be ready.
+  
+- Create the State of the widget:
+  - extends the State with AsyncStateWithController<Widget, Controller>.
+  - override AsyncFactory<Controller, Widget> get controllerFactory.
+  - override Widget buildWhenDone(BuildContext context).
+  - DOESN'T override buildWhenLoading nor buildWhenError. Only if it is explicity named.
+  - use controller field to access controller data.
+  
+Example:
+   
+users_controller.dart:
+ 
+```dart
+class UsersFactory implements AsyncFactory<UsersController, UsersWidget> {
+  Future<UsersController> create(UsersWidget widget) async {
+  @override
+    final users = await loadUsers(widget.limit);
+    return UsersController(users);
+  }
+}
 
-## Synchronous controller example
+class UsersController {
+  final List<String> users;
+  
+  UsersController(this.users);
+}
+
+```
+
+users_widget.dart:
+
+```dart
+class UsersWidget extends StatefulWidget {
+  final int limit;
+  const UsersWidget({required this.limit, super.key});
+
+  @override
+  State<UsersWidget> createState() => _UsersWidgetState();
+}
+
+class _UsersWidgetState
+    extends AsyncStateWithController<UsersWidget, UsersController> {
+  @override
+  AsyncFactory<UsersController, UsersWidget> get controllerFactory =>
+      UsersFactory();
+
+  @override
+  Widget buildWhenDone(BuildContext context) => Text('${controller.users}');
+}
+```
+
+#### Cancellation and isolate work
+
+- Implement `AsyncFactoryIsCancellable` on factory when initialization can be canceled. Its `cancel()` method is called if the widget is disposed before the controller is ready.
+
+- Implement `AsyncFactoryIsIsolated` when `create()` should run in a separate Dart isolate. The factory, parameter, result, and captured data must all be sendable across isolates.
+
+### Controller steps
+- Create a file that contains the controller. 
+    - Create the file in the same directory than the widget file.
+    - Naming rules:
+      - Get the name of the widget without Widget. Example: UsersWidget resolves to Users. UsersView resolves to usersView.
+      - Controller name = resolved name + "Controller". Example: UsersController, UsersViewController.
+      - File name = controller name. Example: users_controller.dart, users_views_controller.dart.
+        
+- Create the State of the widget:
+  - extends the State with StateWithController<Widget, Controller>.
+  - override Controller createController().
+  - use controller field to access controller data.
+
+Example:
+
+counter_controller.dart:
 
 ```dart
 class CounterController {
@@ -50,17 +123,22 @@ class CounterController {
   void increment() => count.value++;
 }
 
-class CounterView extends StatefulWidget {
-  const CounterView({required this.initialValue, super.key});
+```
 
+counter_widget.dart:
+
+```dart
+class CounterWidget extends StatefulWidget {
   final int initialValue;
+  
+  const CounterWidget({required this.initialValue, super.key});
 
   @override
-  State<CounterView> createState() => _CounterViewState();
+  State<CounterWidget> createState() => _CounterWidgetState();
 }
 
-class _CounterViewState
-    extends StateWithController<CounterView, CounterController> {
+class _CounterWidgetState
+    extends StateWithController<CounterWidget, CounterController> {
   @override
   CounterController createController() => CounterController(widget.initialValue);
 
@@ -93,47 +171,6 @@ class SearchController implements Disposable {
   void dispose() => focusNode.dispose();
 }
 ```
-
-## Async controllers
-
-Create an `AsyncFactory<Controller, Parameter>` to load an async controller.
-When the widget is the parameter, use `AsyncStateWithController`:
-
-```dart
-class UsersFactory implements AsyncFactory<UsersController, UsersView> {
-  @override
-  Future<UsersController> create(UsersView widget) async {
-    final users = await loadUsers(widget.limit);
-    return UsersController(users);
-  }
-}
-
-class _UsersViewState
-    extends AsyncStateWithController<UsersView, UsersController> {
-  @override
-  AsyncFactory<UsersController, UsersView> get controllerFactory =>
-      UsersFactory();
-
-  @override
-  Widget buildWhenDone(BuildContext context) => Text('${controller.users}');
-}
-```
-
-Override `buildWhenLoading` and `buildWhenError` for custom UI. Call
-`retryAsyncInitState()` from error UI to attempt initialization again.
-
-For application-wide defaults, set `AsyncState.defaultBuildWhenLoading`,
-`AsyncState.defaultBuildWhenError`, and optionally `AsyncState.onError` during
-application startup.
-
-### Cancellation and isolate work
-
-- Implement `AsyncFactoryIsCancellable` when initialization can be canceled.
-  Its `cancel()` method is called if the widget is disposed before the
-  controller is ready.
-- Implement `AsyncFactoryIsIsolated` when `create()` should run in a
-  separate Dart isolate. The factory, parameter, result, and captured data must
-  all be sendable across isolates.
 
 ## Testing widgets that use controllers
 
